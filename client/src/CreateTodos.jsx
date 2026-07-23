@@ -1,13 +1,13 @@
 import axios from "axios"
 import { useState } from "react"
 
-function CreateTodos(){
+function CreateTodos({ onTodoCreated }){
     const [form,setForm] = useState({
-        name:'',
+        title:'',
         description:'',
-        priority:'',
-        dueDate:''})
-    const [todo,setTodo] = useState('')
+        priority:'medium',
+        dueDate:''
+    })
     const handleChange = (e) => {
         setForm((prev)=>{
             return {...prev,[e.target.name]:e.target.value}
@@ -16,16 +16,24 @@ function CreateTodos(){
     const handleClick = async() => {
         try {
             const res = await axios.post('http://localhost:3000/api/create-todo',form)
-            setTodo(res.data.data)
+            if (onTodoCreated) {
+                onTodoCreated()
+            }
+            setForm({
+                title:'',
+                description:'',
+                priority:'medium',
+                dueDate:''
+            })
         } catch (error) {
             console.error(error)
         }
     }
     return(
         <div className="flex justify-center">
-        <input type="text" placeholder="Add a Title of a TODO" name="name" value={form.name} onChange={handleChange}/>
+        <input type="text" placeholder="Add a Title of a TODO" name="title" value={form.title} onChange={handleChange}/>
         <textarea type="text" placeholder="Add a description" name="description" value={form.description} onChange={handleChange}/>
-        <select name="priority" onChange={handleChange}>
+        <select name="priority" value={form.priority} onChange={handleChange}>
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>
